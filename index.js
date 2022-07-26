@@ -86,7 +86,7 @@ app.put('/api/questions/:id', auth, function(req,res){
       console.log('question not found', err);
       res.send();
     }
-    let answer = req.body.answer.charAt(0).toUpperCase() + req.body.answer.slice(1).toLowerCase;
+    let answer = req.body.answer.charAt(0).toUpperCase() + req.body.answer.slice(1).toLowerCase();
     let answerCount = (question.answers.get(answer) || 0) + 1;
     let sortedMap = [...question.answers.toObject().entries()].sort((a, b) => b[1] - a[1]);
     let index = sortedMap.findIndex(element => element[0] === answer);
@@ -112,7 +112,7 @@ app.put('/api/questions/:id', auth, function(req,res){
 });
 
 app.put('/api/users/:id', auth, function(req,res){
-  UserModel.findById(req.params.id).exec((err, user) => {
+  UserModel.findByIdAndUpdate(req.params.id).exec((err, user) => {
     if (err) {
       console.log('user not found', err);
       res.send();
@@ -120,24 +120,24 @@ app.put('/api/users/:id', auth, function(req,res){
     const {likedQuestion, bookmarkedCategory} = req.body;
     if (likedQuestion) {
       if (user.likedQuestions.includes(likedQuestion)) {
-        user.likedQuestions = user.likedQuestions.filter(element => element !== likedQuestion)
+        user.likedQuestions.pull(likedQuestion);
       } else {
-        user.likedQuestions.push(likedQuestion)
+        user.likedQuestions.push(likedQuestion);
       }
     } else if (bookmarkedCategory){
       if (user.bookmarkedCategories.includes(bookmarkedCategory)) {
-        user.bookmarkedCategories = user.bookmarkedCategories.filter(element => element !== bookmarkedCategory)
+        user.bookmarkedCategories.pull(bookmarkedCategory);
       } else {
-        user.bookmarkedCategories.push(bookmarkedCategory)
+        user.bookmarkedCategories.push(bookmarkedCategory);
       }
     }
-    user.save()
+    user.save();
   });
 });
 
 var mongoose = require('mongoose');
     mongoose.set('debug',true);
-    mongoose.connect(`mongodb+srv://${process.env.USERNAME}:${process.env.PASSWORD}@cluster0.xorwi.mongodb.net/guess-words?retryWrites=true&w=majority`);
+    mongoose.connect(`mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@cluster0.xorwi.mongodb.net/guess-words?retryWrites=true&w=majority`);
     mongoose.Promise = Promise;
 
 var db = mongoose.connection;
